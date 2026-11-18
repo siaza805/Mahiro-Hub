@@ -7,13 +7,27 @@ itself at load time, so the HTTP loader keeps working unchanged:
 loadstring(game:HttpGet("https://raw.githubusercontent.com/siaza805/Mahiro-Hub/main/MahiroHub.lua?v=obf-1"))()
 ```
 
-## Active build: `obfuscate.py` (whole-file encoder)
+## Active build: `obfuscate.py` v2 (multi-layer encoder)
 
 The published `MahiroHub.lua` is produced by `obfuscate.py`. It decodes once at
 load time and then runs the original code at native speed, so there is no
 per-frame runtime overhead — important on mobile. The Prometheus VM build below
 is much stronger but its bytecode interpreter made the script lag badly on
 phones, so it is not the active build.
+
+v2 strengthens the at-rest file without adding any runtime cost:
+- five byte layers (add / sub keystreams + a forward and a backward CBC chain),
+  so every plaintext byte is diffused across the whole ciphertext both ways;
+- substitution over a shuffled hex alphabet, then a keyed chunk-order shuffle;
+- an anti-tamper gate: the layer seeds are stored as `seed - H`, where `H` is a
+  hash of the stored ciphertext, so editing one byte of the blob makes every
+  seed wrong and decoding fails;
+- three nested stages — the real decoder is buried under two encoded layers, so
+  the top file shows only the blob and a tiny bootstrap.
+
+Arithmetic only (no `bit32` / bitwise ops), so the same decoder runs on Luau and
+stock Lua; every build is verified byte-exact (SHA-256) and run on a real Luau
+runtime before publishing.
 
 ## Stronger (but slow on mobile): Prometheus (free, open source)
 

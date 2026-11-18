@@ -7,9 +7,17 @@ itself at load time, so the HTTP loader keeps working unchanged:
 loadstring(game:HttpGet("https://raw.githubusercontent.com/siaza805/Mahiro-Hub/main/MahiroHub.lua?v=obf-1"))()
 ```
 
-## Current build: Prometheus (free, open source)
+## Active build: `obfuscate.py` (whole-file encoder)
 
-The active build is produced with **Prometheus** (https://github.com/levno-710/Prometheus),
+The published `MahiroHub.lua` is produced by `obfuscate.py`. It decodes once at
+load time and then runs the original code at native speed, so there is no
+per-frame runtime overhead — important on mobile. The Prometheus VM build below
+is much stronger but its bytecode interpreter made the script lag badly on
+phones, so it is not the active build.
+
+## Stronger (but slow on mobile): Prometheus (free, open source)
+
+The VM build is produced with **Prometheus** (https://github.com/levno-710/Prometheus),
 a free, open-source Lua/Luau obfuscator. Pipeline (see `prometheus_config.lua`):
 
 | Step            | Effect |
